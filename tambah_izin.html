@@ -7,19 +7,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- 1. FONT FAMILY (Sama dengan Dashboard) --- */
         * {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* Responsive Fix: Allow body to scroll on mobile, fixed on desktop */
         body {
             background-color: #ffffff;
         }
 
-        /* --- 2. STYLE KHUSUS UNTUK FORM --- */
         .custom-input { border: 1.5px solid #a1a1a1; }
-       
-        /* Fix Date Picker Icon */
+        
         input[type="date"]::-webkit-calendar-picker-indicator {
             background: transparent;
             bottom: 0;
@@ -33,7 +31,6 @@
             width: auto;
         }
 
-        /* --- 3. TAMBAHAN: CSS UNTUK NOTIFIKASI (TOAST) --- */
         .toast {
             position: fixed; top: 20px; right: 20px;
             background: #2e7d32; color: #fff;
@@ -45,14 +42,18 @@
         }
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.error { background: #d32f2f; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .toast { left: 20px; right: 20px; text-align: center; }
+        }
     </style>
 </head>
-<body class="bg-white flex h-screen overflow-hidden">
+<body class="bg-white flex flex-col md:flex-row min-h-screen md:h-screen md:overflow-hidden">
 
     <div id="toast" class="toast">Berhasil</div>
 
-    <aside class="w-[260px] flex-shrink-0 bg-white border-r border-black flex flex-col py-[24px] px-[16px]">
-       
+    <aside id="sidebar" class="hidden md:flex w-[260px] flex-shrink-0 bg-white border-r border-black flex-col py-[24px] px-[16px]">
         <div class="flex items-center mb-[40px] pl-[10px]">
             <img src="logo.png" alt="Logo" class="w-[40px] h-auto mr-[12px] object-contain">
             <span class="text-[22px] font-[800] text-[#1a2b5e]">Perizinan</span>
@@ -77,51 +78,52 @@
     </aside>
 
     <main class="flex-1 flex flex-col h-full bg-white overflow-y-auto">
-       
-       <header class="h-[70px] border-b border-black flex items-center justify-between px-[40px] pb-[12px] sticky top-0 bg-white z-10">
+        
+        <header class="min-h-[70px] border-b border-black flex items-center justify-between px-6 md:px-[40px] py-4 sticky top-0 bg-white z-10">
+            <a href="karyawan.html" class="md:hidden text-[#1a2b5e] text-xl mr-3">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
 
-           
-            <h2 class="text-[28px] font-bold text-black">Tambah Perizinan</h2>
+            <h2 class="text-xl md:text-[28px] font-bold text-black flex-1">Tambah Perizinan</h2>
 
-            <div class="flex items-center">
-                <i class="fas fa-user-circle text-[32px] text-[#333] mr-[10px]"></i>
-               
+            <div class="flex items-center ml-2">
+                <i class="fas fa-user-circle text-2xl md:text-[32px] text-[#333] mr-[8px] md:mr-[10px]"></i>
                 <div class="text-right leading-[1.2]">
-                    <span class="block font-bold text-[16px] text-[#333]" id="headerName">Loading...</span>
-                    <span class="block text-[12px] text-[#666]" id="headerRole">Loading...</span>
+                    <span class="block font-bold text-sm md:text-[16px] text-[#333]" id="headerName">Loading...</span>
+                    <span class="block text-[10px] md:text-[12px] text-[#666]" id="headerRole">Loading...</span>
                 </div>
             </div>
         </header>
 
-        <div class="flex-1 flex flex-col items-center pt-12 pb-10 px-4">
+        <div class="flex-1 flex flex-col items-center pt-6 md:pt-12 pb-10 px-4">
             <div class="w-full max-w-3xl">
-               
-                <form class="space-y-6" onsubmit="event.preventDefault(); kirimIzin();">
+                
+                <form class="space-y-4 md:space-y-6" onsubmit="event.preventDefault(); kirimIzin();">
                     <div>
-                        <label class="block text-xl font-semibold mb-2">Nama</label>
+                        <label class="block text-lg md:text-xl font-semibold mb-2">Nama</label>
                         <input type="text" id="inputNama" readonly
-                               class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg bg-gray-100 cursor-not-allowed">
+                               class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-base md:text-lg bg-gray-100 cursor-not-allowed">
                     </div>
 
                     <div>
-                        <label class="block text-xl font-semibold mb-2">Jabatan</label>
+                        <label class="block text-lg md:text-xl font-semibold mb-2">Jabatan</label>
                         <input type="text" id="inputJabatan" readonly
-                               class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg bg-gray-100 cursor-not-allowed">
+                               class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-base md:text-lg bg-gray-100 cursor-not-allowed">
                     </div>
 
-                    <div class="grid grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
                         <div>
-                            <label class="block text-xl font-semibold mb-2">Tanggal</label>
+                            <label class="block text-lg md:text-xl font-semibold mb-2">Tanggal</label>
                             <div class="relative">
                                 <input type="date" id="inputTanggal" required
-                                       class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg cursor-pointer">
+                                       class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-base md:text-lg cursor-pointer">
                                 <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-black pointer-events-none"></i>
                             </div>
                         </div>
                         <div>
-                            <label class="block text-xl font-semibold mb-2">Jenis</label>
+                            <label class="block text-lg md:text-xl font-semibold mb-2">Jenis</label>
                             <div class="relative">
-                                <select id="inputJenis" required class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg appearance-none bg-white cursor-pointer">
+                                <select id="inputJenis" required class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-base md:text-lg appearance-none bg-white cursor-pointer">
                                     <option value="" selected disabled>Pilih</option>
                                     <option value="Cuti">Cuti</option>
                                     <option value="Izin">Izin</option>
@@ -133,15 +135,15 @@
                     </div>
 
                     <div>
-                        <label class="block text-xl font-semibold mb-2">Deskripsi</label>
-                        <textarea id="inputAlasan" required rows="5" class="w-full p-4 custom-input rounded-xl outline-none text-gray-500 text-lg" placeholder="Masukkan alasan pengajuan..."></textarea>
+                        <label class="block text-lg md:text-xl font-semibold mb-2">Deskripsi</label>
+                        <textarea id="inputAlasan" required rows="4" class="w-full p-4 custom-input rounded-xl outline-none text-gray-500 text-base md:text-lg" placeholder="Masukkan alasan pengajuan..."></textarea>
                     </div>
 
-                    <div class="flex justify-center gap-6 pt-10">
-                        <button type="button" onclick="window.location.href='karyawan.html'" class="w-44 py-2 border-2 border-emerald-500 text-emerald-500 font-bold rounded-xl hover:bg-emerald-50 transition text-xl">
+                    <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-6 pt-6 md:pt-10">
+                        <button type="button" onclick="window.location.href='karyawan.html'" class="w-full md:w-44 py-3 md:py-2 border-2 border-emerald-500 text-emerald-500 font-bold rounded-xl hover:bg-emerald-50 transition text-lg md:text-xl">
                             Cancel
                         </button>
-                        <button type="submit" id="btnSubmit" class="w-44 py-2 bg-[#41a350] text-white font-bold rounded-xl hover:bg-emerald-600 transition shadow-sm text-xl flex justify-center items-center">
+                        <button type="submit" id="btnSubmit" class="w-full md:w-44 py-3 md:py-2 bg-[#41a350] text-white font-bold rounded-xl hover:bg-emerald-600 transition shadow-sm text-lg md:text-xl flex justify-center items-center">
                             Save
                         </button>
                     </div>
@@ -152,9 +154,8 @@
     </main>
 
     <script>
+        // ... (Script Anda tetap sama tanpa ada perubahan logika) ...
         const API_URL = "https://script.google.com/macros/s/AKfycbyOineBxRrcz4R8Gy5zirp2m5xT4FkM-2-zfs7NOKr5nUSEeEOwern50n-dik_1qr4c/exec";
-
-        // 1. Cek Login & Auto Fill Data User
         const user = JSON.parse(localStorage.getItem("user") || "{}");
         const userId = user.id || user.user_id;
 
@@ -163,41 +164,29 @@
             window.location.href = "index.html";
         }
 
-        // Isi form otomatis saat halaman dimuat
         document.addEventListener('DOMContentLoaded', function() {
-            // Set Tanggal Hari Ini
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('inputTanggal').value = today;
-
-            // Set Data User (Readonly)
             document.getElementById('inputNama').value = user.nama || "";
             document.getElementById('inputJabatan').value = user.jabatan || "";
-            
-            // Set Header Info
             document.getElementById('headerName').textContent = user.nama || "";
             document.getElementById('headerRole').textContent = user.jabatan || "Karyawan";
         });
 
-        // 2. Fungsi Logout
         function logout() {
             localStorage.removeItem("user");
             window.location.href = "index.html";
         }
 
-        // 3. Fungsi Toast Notification
         function showToast(text, isError = false) {
             const toast = document.getElementById("toast");
             toast.textContent = text;
-            if (isError) {
-                toast.classList.add("error");
-            } else {
-                toast.classList.remove("error");
-            }
+            if (isError) { toast.classList.add("error"); } 
+            else { toast.classList.remove("error"); }
             toast.classList.add("show");
             setTimeout(() => toast.classList.remove("show"), 2500);
         }
 
-        // 4. Fungsi Kirim Izin
         function kirimIzin() {
             const jenis = document.getElementById("inputJenis").value;
             const tanggal = document.getElementById("inputTanggal").value;
@@ -209,7 +198,6 @@
                 return;
             }
 
-            // Ubah tombol jadi Loading
             const originalText = btnSubmit.innerText;
             btnSubmit.innerText = "Mengirim...";
             btnSubmit.disabled = true;
@@ -226,15 +214,10 @@
             .then(r => r.json())
             .then(() => {
                 showToast("Izin berhasil dikirim!");
-                
-                // Redirect ke dashboard setelah sukses
-                setTimeout(() => {
-                    window.location.href = "karyawan.html";
-                }, 1500);
+                setTimeout(() => { window.location.href = "karyawan.html"; }, 1500);
             })
             .catch(err => {
-                showToast("Gagal mengirim data. Cek koneksi.", true);
-                // Kembalikan tombol seperti semula
+                showToast("Gagal mengirim data.", true);
                 btnSubmit.innerText = originalText;
                 btnSubmit.disabled = false;
                 btnSubmit.classList.remove("opacity-50", "cursor-not-allowed");
@@ -242,5 +225,4 @@
         }
     </script>
 </body>
-
 </html>
