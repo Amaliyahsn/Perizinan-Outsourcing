@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Aksi - Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Standarisasi Font dan Base Style */
+        * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #ffffff; }
+
+        /* Style Header Tabel */
+        .table-header { background-color: #34495e; color: white; }
+        
+        /* Custom Scrollbar */
+        main::-webkit-scrollbar { width: 8px; }
+        main::-webkit-scrollbar-track { background: #f1f1f1; }
+        main::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-white flex h-screen overflow-hidden">
+
+    <aside class="w-[260px] flex-shrink-0 bg-white border-r border-black flex flex-col py-[24px] px-[16px]">
+        
+        <div class="flex items-center mb-[40px] pl-[10px]">
+            <img src="logo.png" alt="Logo" class="w-[40px] h-auto mr-[12px] object-contain">
+            <span class="text-[22px] font-[800] text-[#1a2b5e]">Perizinan</span>
+        </div>
+
+        <nav class="flex-1 space-y-[8px]"> 
+            <a href="admin.html" class="flex items-center px-[12px] py-[10px] bg-[#637dbd] text-white rounded-lg transition font-[500] no-underline">
+                <i class="fa-solid fa-table-cells-large w-[20px] mr-[12px] text-center"></i>
+                <span>Beranda</span>
+            </a>
+        </nav>
+
+        <a href="login.html" class="mt-auto flex items-center justify-between w-full h-[40px] px-[16px] py-[8px] bg-[#fef2f2] text-[#ef4444] rounded-lg hover:bg-[#fee2e2] transition font-[500] text-[14px] no-underline">
+            <span>Keluar</span>
+            <i class="fa-solid fa-arrow-right-from-bracket text-[14px]"></i>
+        </a>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-white overflow-y-auto">
+        
+        <header class="h-[90px] border-b border-black flex items-center justify-between px-[40px] sticky top-0 bg-white z-20">
+            <h2 class="text-[30px] font-bold text-black">Detail Karyawan</h2>
+            <div class="flex items-center gap-3">
+                <div class="text-right leading-tight">
+                    <p class="font-bold text-lg">Admin</p>
+                    <p class="text-sm text-gray-500">Administrator</p>
+                </div>
+                <div class="w-12 h-12 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
+                    <i class="fas fa-user text-3xl mt-2"></i>
+                </div>
+            </div>
+        </header>
+
+        <div class="p-[40px] space-y-12">
+            
+            <div class="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="p-4 text-center border-r border-gray-600">Full Name</th>
+                            <th class="p-4 text-center border-r border-gray-600">Jabatan</th>
+                            <th class="p-4 text-center border-r border-gray-600">Kuota Cuti</th>
+                            <th class="p-4 text-center border-r border-gray-600">Kuota Terpakai</th>
+                            <th class="p-4 text-center">Kuota Tersisa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userProfileBody">
+                        <tr><td colspan="5" class="p-4 text-center text-gray-500">Memuat profil...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center gap-2 text-2xl font-bold text-[#1a2b5e]">
+                    <i class="fas fa-history"></i>
+                    <span>Aksi</span>
+                </div>
+                <div class="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="p-4 text-center border-r border-gray-600">Tanggal</th>
+                                <th class="p-4 text-center border-r border-gray-600">Jenis</th>
+                                <th class="p-4 text-center">Alasan / Deskripsi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="aksiTableBody">
+                            <tr><td colspan="3" class="p-4 text-center text-gray-500">Memuat riwayat...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOineBxRrcz4R8Gy5zirp2m5xT4FkM-2-zfs7NOKr5nUSEeEOwern50n-dik_1qr4c/exec";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetUserId = urlParams.get('uid');
+
+        if (!targetUserId) {
+            alert("User ID tidak ditemukan!");
+            window.location.href = "dashboard_admin.html";
+        }
+
+        function loadDetail() {
+            fetch(`${API_URL}?action=detailKaryawan&user_id=${targetUserId}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Isi Tabel Profil
+                    const profileBody = document.getElementById("userProfileBody");
+                    profileBody.innerHTML = `
+                        <tr class="border-b">
+                            <td class="p-4 text-blue-600 text-center font-medium">${data.profil.nama}</td>
+                            <td class="p-4 text-center text-gray-600">${data.profil.jabatan}</td>
+                            <td class="p-4 text-center text-gray-600">${data.kuota.kuota}</td>
+                            <td class="p-4 text-center text-gray-600">${data.kuota.terpakai}</td>
+                            <td class="p-4 text-center text-gray-600 font-bold">${data.kuota.sisa}</td>
+                        </tr>
+                    `;
+
+                    // Isi Tabel History
+                    const aksiBody = document.getElementById("aksiTableBody");
+                    aksiBody.innerHTML = "";
+
+                    if (data.history.length === 0) {
+                        aksiBody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-gray-400">Belum ada riwayat.</td></tr>`;
+                    } else {
+                        data.history.forEach((h, index) => {
+                            const bgClass = index % 2 === 0 ? "bg-white" : "bg-blue-50/30";
+                            aksiBody.innerHTML += `
+                                <tr class="border-b ${bgClass}">
+                                    <td class="p-4 text-blue-600 text-center border-r border-gray-100">${h.tanggal}</td>
+                                    <td class="p-4 text-center text-gray-600 font-semibold border-r border-gray-100">${h.jenis}</td>
+                                    <td class="p-4 text-center text-gray-600">${h.alasan}</td>
+                                </tr>`;
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Gagal mengambil data.");
+                });
+        }
+
+        loadDetail();
+    </script>
+</body>
+</html>

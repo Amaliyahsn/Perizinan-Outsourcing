@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Perizinan - Enseval</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- 1. FONT FAMILY (Sama dengan Dashboard) --- */
+        * {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+        }
+
+        /* --- 2. STYLE KHUSUS UNTUK FORM --- */
+        .custom-input { border: 1.5px solid #a1a1a1; }
+       
+        /* Fix Date Picker Icon */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            background: transparent;
+            bottom: 0;
+            color: transparent;
+            cursor: pointer;
+            height: auto;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: auto;
+        }
+
+        /* --- 3. TAMBAHAN: CSS UNTUK NOTIFIKASI (TOAST) --- */
+        .toast {
+            position: fixed; top: 20px; right: 20px;
+            background: #2e7d32; color: #fff;
+            padding: 12px 18px; border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,.2);
+            font-weight: bold; z-index: 999;
+            opacity: 0; transform: translateY(-10px);
+            transition: all .3s ease;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { background: #d32f2f; }
+    </style>
+</head>
+<body class="bg-white flex h-screen overflow-hidden">
+
+    <div id="toast" class="toast">Berhasil</div>
+
+    <aside class="w-[260px] flex-shrink-0 bg-white border-r border-black flex flex-col py-[24px] px-[16px]">
+       
+        <div class="flex items-center mb-[40px] pl-[10px]">
+            <img src="logo.png" alt="Logo" class="w-[40px] h-auto mr-[12px] object-contain">
+            <span class="text-[22px] font-[800] text-[#1a2b5e]">Perizinan</span>
+        </div>
+
+        <nav class="flex-1 space-y-[8px]"> 
+            <a href="karyawan.html" class="flex items-center px-[12px] py-[10px] text-[#555] rounded-lg hover:bg-gray-100 transition font-[500] no-underline">
+                <i class="fa-solid fa-table-cells-large w-[20px] mr-[12px] text-center"></i>
+                <span>Beranda</span>
+            </a>
+
+            <a href="#" class="flex items-center px-[12px] py-[10px] bg-[#637dbd] text-white rounded-lg transition shadow-none font-[500] no-underline">
+                <i class="fa-solid fa-plus w-[20px] mr-[12px] text-center text-sm"></i>
+                <span>Tambah Perizinan</span>
+            </a>
+        </nav>
+
+        <a href="#" onclick="logout()" class="mt-auto flex items-center justify-between w-full h-[40px] px-[16px] py-[8px] bg-[#fef2f2] text-[#ef4444] rounded-lg hover:bg-[#fee2e2] transition font-[500] text-[14px] no-underline">
+            <span>Keluar</span>
+            <i class="fa-solid fa-arrow-right-from-bracket text-[14px]"></i>
+        </a>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full bg-white overflow-y-auto">
+       
+       <header class="h-[70px] border-b border-black flex items-center justify-between px-[40px] pb-[12px] sticky top-0 bg-white z-10">
+
+           
+            <h2 class="text-[28px] font-bold text-black">Tambah Perizinan</h2>
+
+            <div class="flex items-center">
+                <i class="fas fa-user-circle text-[32px] text-[#333] mr-[10px]"></i>
+               
+                <div class="text-right leading-[1.2]">
+                    <span class="block font-bold text-[16px] text-[#333]" id="headerName">Loading...</span>
+                    <span class="block text-[12px] text-[#666]" id="headerRole">Loading...</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="flex-1 flex flex-col items-center pt-12 pb-10 px-4">
+            <div class="w-full max-w-3xl">
+               
+                <form class="space-y-6" onsubmit="event.preventDefault(); kirimIzin();">
+                    <div>
+                        <label class="block text-xl font-semibold mb-2">Nama</label>
+                        <input type="text" id="inputNama" readonly
+                               class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg bg-gray-100 cursor-not-allowed">
+                    </div>
+
+                    <div>
+                        <label class="block text-xl font-semibold mb-2">Jabatan</label>
+                        <input type="text" id="inputJabatan" readonly
+                               class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg bg-gray-100 cursor-not-allowed">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-8">
+                        <div>
+                            <label class="block text-xl font-semibold mb-2">Tanggal</label>
+                            <div class="relative">
+                                <input type="date" id="inputTanggal" required
+                                       class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg cursor-pointer">
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-black pointer-events-none"></i>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xl font-semibold mb-2">Jenis</label>
+                            <div class="relative">
+                                <select id="inputJenis" required class="w-full p-3 custom-input rounded-xl outline-none text-gray-500 text-lg appearance-none bg-white cursor-pointer">
+                                    <option value="" selected disabled>Pilih</option>
+                                    <option value="Cuti">Cuti</option>
+                                    <option value="Izin">Izin</option>
+                                    <option value="Sakit">Sakit</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-black pointer-events-none"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xl font-semibold mb-2">Deskripsi</label>
+                        <textarea id="inputAlasan" required rows="5" class="w-full p-4 custom-input rounded-xl outline-none text-gray-500 text-lg" placeholder="Masukkan alasan pengajuan..."></textarea>
+                    </div>
+
+                    <div class="flex justify-center gap-6 pt-10">
+                        <button type="button" onclick="window.location.href='karyawan.html'" class="w-44 py-2 border-2 border-emerald-500 text-emerald-500 font-bold rounded-xl hover:bg-emerald-50 transition text-xl">
+                            Cancel
+                        </button>
+                        <button type="submit" id="btnSubmit" class="w-44 py-2 bg-[#41a350] text-white font-bold rounded-xl hover:bg-emerald-600 transition shadow-sm text-xl flex justify-center items-center">
+                            Save
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOineBxRrcz4R8Gy5zirp2m5xT4FkM-2-zfs7NOKr5nUSEeEOwern50n-dik_1qr4c/exec";
+
+        // 1. Cek Login & Auto Fill Data User
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const userId = user.id || user.user_id;
+
+        if (!userId) {
+            alert("Silakan login dulu");
+            window.location.href = "login.html";
+        }
+
+        // Isi form otomatis saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set Tanggal Hari Ini
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inputTanggal').value = today;
+
+            // Set Data User (Readonly)
+            document.getElementById('inputNama').value = user.nama || "";
+            document.getElementById('inputJabatan').value = user.jabatan || "";
+            
+            // Set Header Info
+            document.getElementById('headerName').textContent = user.nama || "";
+            document.getElementById('headerRole').textContent = user.jabatan || "Karyawan";
+        });
+
+        // 2. Fungsi Logout
+        function logout() {
+            localStorage.removeItem("user");
+            window.location.href = "login.html";
+        }
+
+        // 3. Fungsi Toast Notification
+        function showToast(text, isError = false) {
+            const toast = document.getElementById("toast");
+            toast.textContent = text;
+            if (isError) {
+                toast.classList.add("error");
+            } else {
+                toast.classList.remove("error");
+            }
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+        }
+
+        // 4. Fungsi Kirim Izin
+        function kirimIzin() {
+            const jenis = document.getElementById("inputJenis").value;
+            const tanggal = document.getElementById("inputTanggal").value;
+            const alasan = document.getElementById("inputAlasan").value;
+            const btnSubmit = document.getElementById("btnSubmit");
+
+            if (!jenis || !tanggal || !alasan) {
+                showToast("Harap isi semua kolom!", true);
+                return;
+            }
+
+            // Ubah tombol jadi Loading
+            const originalText = btnSubmit.innerText;
+            btnSubmit.innerText = "Mengirim...";
+            btnSubmit.disabled = true;
+            btnSubmit.classList.add("opacity-50", "cursor-not-allowed");
+
+            fetch(
+                `${API_URL}?action=addIzin` +
+                `&user_id=${userId}` +
+                `&nama=${encodeURIComponent(user.nama)}` +
+                `&jenis=${jenis}` +
+                `&tanggal=${tanggal}` +
+                `&alasan=${encodeURIComponent(alasan)}`
+            )
+            .then(r => r.json())
+            .then(() => {
+                showToast("Izin berhasil dikirim!");
+                
+                // Redirect ke dashboard setelah sukses
+                setTimeout(() => {
+                    window.location.href = "karyawan.html";
+                }, 1500);
+            })
+            .catch(err => {
+                showToast("Gagal mengirim data. Cek koneksi.", true);
+                // Kembalikan tombol seperti semula
+                btnSubmit.innerText = originalText;
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove("opacity-50", "cursor-not-allowed");
+            });
+        }
+    </script>
+</body>
+</html>
