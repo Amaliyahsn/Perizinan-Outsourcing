@@ -7,16 +7,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         .table-header { background-color: #34495e; color: white; }
         .btn-lihat { color: #000; font-weight: bold; text-decoration: underline; cursor: pointer; }
-        /* Animasi Loading */
         .loading { text-align: center; padding: 20px; color: #666; font-style: italic; }
+        
+        /* Sidebar transition & overlay */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        @media (max-width: 768px) {
+            #sidebar.closed { transform: translateX(-100%); }
+            .sidebar-overlay { display: none; }
+            .sidebar-overlay.active { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; }
+        }
     </style>
 </head>
-<body class="flex h-screen bg-white font-sans overflow-hidden">
+<body class="flex flex-col md:flex-row h-screen bg-white overflow-hidden">
 
-    <aside class="w-64 border-r border-black flex flex-col p-6">
-        <div class="flex items-center gap-3 mb-10">
+    <button onclick="toggleSidebar()" class="md:hidden fixed top-5 left-4 z-50 bg-[#1a2b5e] text-white p-2 rounded-md shadow-lg">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed md:relative w-64 h-full border-r border-black flex flex-col p-6 bg-white z-40 closed md:transform-none">
+        <div class="flex items-center gap-3 mb-10 mt-10 md:mt-0">
             <img src="logo.png" alt="Logo" class="h-8">
             <h1 class="text-2xl font-bold text-blue-900">Perizinan</h1>
         </div>
@@ -25,36 +39,36 @@
                 <i class="fas fa-th-large"></i> Beranda
             </a>
         </nav>
-        <button onclick="logout()" class="flex items-center justify-between p-3 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition w-full text-left">
+        <button onclick="logout()" class="flex items-center justify-between p-3 bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition w-full text-left mt-auto">
             <span>Keluar</span>
             <i class="fas fa-sign-out-alt"></i>
         </button>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full">
-        <header class="h-20 border-b border-black flex items-center justify-between px-10">
-            <h2 class="text-4xl font-bold">Manajemen User</h2>
+    <main class="flex-1 flex flex-col h-full w-full">
+        <header class="min-h-[80px] border-b border-black flex items-center justify-between px-6 md:px-10 bg-white">
+            <h2 class="text-2xl md:text-4xl font-bold ml-10 md:ml-0">Manajemen User</h2>
             <div class="flex items-center gap-3">
-                <div class="text-right leading-tight">
-                    <p class="font-bold text-lg">Admin</p>
+                <div class="text-right leading-tight hidden sm:block">
+                    <p class="font-bold text-base md:text-lg">Admin</p>
                     <p class="text-sm text-gray-500">Administrator</p>
                 </div>
-                <div class="w-12 h-12 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
-                    <i class="fas fa-user text-3xl mt-2"></i>
+                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
+                    <i class="fas fa-user text-2xl md:text-3xl mt-2"></i>
                 </div>
             </div>
         </header>
 
-        <div class="p-10 flex-1 overflow-y-auto">
+        <div class="p-4 md:p-10 flex-1 overflow-y-auto">
             <div class="flex justify-center mb-8">
-                <div class="relative w-2/3">
+                <div class="relative w-full md:w-2/3">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by name..." class="w-full pl-12 pr-4 py-3 border border-black rounded-full outline-none focus:ring-2 focus:ring-blue-500">
                 </div>
             </div>
 
-            <div class="overflow-hidden border border-gray-200 rounded-lg">
-                <table class="w-full text-left border-collapse">
+            <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                <table class="w-full text-left border-collapse min-w-[800px]">
                     <thead class="table-header">
                         <tr>
                             <th class="p-4 text-center">Full Name</th>
@@ -74,13 +88,21 @@
     </main>
 
     <script>
+        // Toggle Sidebar for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('closed');
+            overlay.classList.toggle('active');
+        }
+
         const API_URL = "https://script.google.com/macros/s/AKfycbyOineBxRrcz4R8Gy5zirp2m5xT4FkM-2-zfs7NOKr5nUSEeEOwern50n-dik_1qr4c/exec";
 
         // 1. Cek Login Admin
         const user = JSON.parse(localStorage.getItem("user") || "{}");
         if (user.role !== "admin") {
             alert("Akses ditolak! Silakan login sebagai Admin.");
-            window.location.href = "index.html"; // Pastikan file login Anda bernama login.html
+            window.location.href = "index.html";
         }
 
         // 2. Fungsi Load Data Karyawan
@@ -89,7 +111,7 @@
                 .then(res => res.json())
                 .then(data => {
                     const tbody = document.getElementById('tableBody');
-                    tbody.innerHTML = ""; // Bersihkan loading
+                    tbody.innerHTML = ""; 
 
                     if (data.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center">Tidak ada data karyawan.</td></tr>`;
@@ -126,11 +148,7 @@
                 const nameCol = row.getElementsByTagName("td")[0];
                 if (nameCol) {
                     const txtValue = nameCol.textContent || nameCol.innerText;
-                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                        row.style.display = "";
-                    } else {
-                        row.style.display = "none";
-                    }
+                    row.style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
                 }
             });
         }
@@ -138,12 +156,10 @@
         // 4. Logout
         function logout() {
             localStorage.removeItem("user");
-            window.location.href = "index.html"; // Sesuaikan dengan nama file login Anda
+            window.location.href = "index.html";
         }
 
-        // Jalankan saat halaman dibuka
         loadKaryawan();
     </script>
 </body>
-
 </html>
