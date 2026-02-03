@@ -80,7 +80,7 @@
         const user = JSON.parse(localStorage.getItem("user") || "{}");
         if (user.role !== "admin") {
             alert("Akses ditolak! Silakan login sebagai Admin.");
-            window.location.href = "login.html"; // Pastikan file login Anda bernama login.html
+            window.location.href = "index.html"; // Pastikan file login Anda bernama login.html
         }
 
         // 2. Fungsi Load Data Karyawan
@@ -138,11 +138,12 @@
         // 4. Logout
         function logout() {
             localStorage.removeItem("user");
-            window.location.href = "login.html"; // Sesuaikan dengan nama file login Anda
+            window.location.href = "index.html"; // Sesuaikan dengan nama file login Anda
         }
 
         // Jalankan saat halaman dibuka
         loadKaryawan();
     </script>
 </body>
+
 </html>
