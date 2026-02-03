@@ -9,22 +9,37 @@
     <style>
         /* Standarisasi Font dan Base Style */
         * { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #ffffff; }
+        
+        /* Mobile adjustment: allow body to scroll when sidebar is hidden */
+        body { background-color: #ffffff; min-height: 100vh; }
 
-        /* Style Header Tabel */
         .table-header { background-color: #34495e; color: white; }
         
-        /* Custom Scrollbar */
         main::-webkit-scrollbar { width: 8px; }
         main::-webkit-scrollbar-track { background: #f1f1f1; }
         main::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        /* Sidebar Transition */
+        #sidebar { transition: transform 0.3s ease-in-out; }
+        
+        @media (max-width: 768px) {
+            #sidebar.closed { transform: translateX(-100%); }
+            .content-overlay { display: none; }
+            .content-overlay.active { display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 30; }
+        }
     </style>
 </head>
-<body class="bg-white flex h-screen overflow-hidden">
+<body class="bg-white flex flex-col md:flex-row h-screen md:overflow-hidden">
 
-    <aside class="w-[260px] flex-shrink-0 bg-white border-r border-black flex flex-col py-[24px] px-[16px]">
+    <button onclick="toggleSidebar()" class="md:hidden fixed top-6 left-4 z-50 bg-[#1a2b5e] text-white p-2 rounded-md shadow-lg">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="overlay" class="content-overlay" onclick="toggleSidebar()"></div>
+
+    <aside id="sidebar" class="fixed md:relative w-[260px] h-full flex-shrink-0 bg-white border-r border-black flex flex-col py-[24px] px-[16px] z-40 closed md:transform-none">
         
-        <div class="flex items-center mb-[40px] pl-[10px]">
+        <div class="flex items-center mb-[40px] pl-[10px] mt-10 md:mt-0">
             <img src="logo.png" alt="Logo" class="w-[40px] h-auto mr-[12px] object-contain">
             <span class="text-[22px] font-[800] text-[#1a2b5e]">Perizinan</span>
         </div>
@@ -42,25 +57,25 @@
         </a>
     </aside>
 
-    <main class="flex-1 flex flex-col h-full bg-white overflow-y-auto">
+    <main class="flex-1 flex flex-col h-full bg-white overflow-y-auto w-full">
         
-        <header class="h-[90px] border-b border-black flex items-center justify-between px-[40px] sticky top-0 bg-white z-20">
-            <h2 class="text-[30px] font-bold text-black">Detail Karyawan</h2>
+        <header class="min-h-[90px] border-b border-black flex items-center justify-between px-6 md:px-[40px] sticky top-0 bg-white z-20">
+            <h2 class="text-xl md:text-[30px] font-bold text-black ml-10 md:ml-0">Detail Karyawan</h2>
             <div class="flex items-center gap-3">
-                <div class="text-right leading-tight">
-                    <p class="font-bold text-lg">Admin</p>
-                    <p class="text-sm text-gray-500">Administrator</p>
+                <div class="text-right leading-tight hidden sm:block">
+                    <p class="font-bold text-base md:text-lg">Admin</p>
+                    <p class="text-xs md:text-sm text-gray-500">Administrator</p>
                 </div>
-                <div class="w-12 h-12 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
-                    <i class="fas fa-user text-3xl mt-2"></i>
+                <div class="w-10 h-10 md:w-12 md:h-12 border-2 border-black rounded-full flex items-center justify-center overflow-hidden">
+                    <i class="fas fa-user text-2xl md:text-3xl mt-2"></i>
                 </div>
             </div>
         </header>
 
-        <div class="p-[40px] space-y-12">
+        <div class="p-4 md:p-[40px] space-y-8 md:space-y-12">
             
-            <div class="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
-                <table class="w-full text-left border-collapse">
+            <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                <table class="w-full text-left border-collapse min-w-[700px]">
                     <thead class="table-header">
                         <tr>
                             <th class="p-4 text-center border-r border-gray-600">Full Name</th>
@@ -77,12 +92,12 @@
             </div>
 
             <div class="space-y-4">
-                <div class="flex items-center gap-2 text-2xl font-bold text-[#1a2b5e]">
+                <div class="flex items-center gap-2 text-xl md:text-2xl font-bold text-[#1a2b5e]">
                     <i class="fas fa-history"></i>
                     <span>Aksi</span>
                 </div>
-                <div class="overflow-hidden border border-gray-200 rounded-lg shadow-sm">
-                    <table class="w-full text-left border-collapse">
+                <div class="overflow-x-auto border border-gray-200 rounded-lg shadow-sm">
+                    <table class="w-full text-left border-collapse min-w-[600px]">
                         <thead class="table-header">
                             <tr>
                                 <th class="p-4 text-center border-r border-gray-600">Tanggal</th>
@@ -100,21 +115,27 @@
     </main>
 
     <script>
-        const API_URL = "https://script.google.com/macros/s/AKfycbyOineBxRrcz4R8Gy5zirp2m5xT4FkM-2-zfs7NOKr5nUSEeEOwern50n-dik_1qr4c/exec";
+        // Sidebar Toggle Function for Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('closed');
+            overlay.classList.toggle('active');
+        }
 
+        const API_URL = "https://script.google.com/macros/s/AKfycbyOineBxRrcz4R8Gy5zirp2m5xT4FkM-2-zfs7NOKr5nUSEeEOwern50n-dik_1qr4c/exec";
         const urlParams = new URLSearchParams(window.location.search);
         const targetUserId = urlParams.get('uid');
 
         if (!targetUserId) {
             alert("User ID tidak ditemukan!");
-            window.location.href = "dashboard_admin.html";
+            window.location.href = "admin.html";
         }
 
         function loadDetail() {
             fetch(`${API_URL}?action=detailKaryawan&user_id=${targetUserId}`)
                 .then(res => res.json())
                 .then(data => {
-                    // Isi Tabel Profil
                     const profileBody = document.getElementById("userProfileBody");
                     profileBody.innerHTML = `
                         <tr class="border-b">
@@ -126,7 +147,6 @@
                         </tr>
                     `;
 
-                    // Isi Tabel History
                     const aksiBody = document.getElementById("aksiTableBody");
                     aksiBody.innerHTML = "";
 
@@ -153,5 +173,4 @@
         loadDetail();
     </script>
 </body>
-
 </html>
