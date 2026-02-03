@@ -264,7 +264,7 @@
             .then(r => r.json())
             .then(d => {
                 const sisa = d.sisa !== undefined ? d.sisa : 0;
-                document.getElementById("sisaCutiText").textContent = `${sisa} / 12`;
+                document.getElementById("sisaCutiText").textContent = `Sisa Cuti: ${sisa}`;
             });
     }
 
@@ -282,3 +282,4 @@
 </script>
 </body>
 </html>
+
